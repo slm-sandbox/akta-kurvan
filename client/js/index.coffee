@@ -5,12 +5,12 @@ window.requestAnimationFrame = requestAnimationFrame;
 
 
 # State variables
-state =
+window.state =
   players: {}
   playerId: null
 
 # "Cached" DOM references
-field = svg = null
+window.field = window.svg = null
 
 class Player
   constructor: (element) ->
@@ -18,7 +18,7 @@ class Player
     @pathElements = [element]
 
 
-handlers =
+window.handlers =
   players: (players) ->
     console.log 'Got players'
     if not state.players[Object.keys(players)[0]]
@@ -31,26 +31,29 @@ socket = io.connect 'http://localhost:8080'
 socket.on 'connect', ->
   console.log "Connected"
 
+socket.on 'newGame', (data) ->
+  console.log 'Got new game'
+  initGame(data.players)
+
+  while svg.lastChild
+      svg.removeChild(svg.lastChild);
+
+  svg.width = data.dimensions.x
+  svg.height = data.dimensions.y
+  state.players = []
+
 socket.on 'players', (players) ->
-  console.log 'Got players'
+  console.log 'Got players', players
   for id, player of players
     players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
 
-socket.on 'newGame', (players) ->
-  console.log 'Got new game'
-  initGame(players)
 
-  svg.innerHTML = ''
-  svg.height = data.maxHeight
-  svg.width  = data.maxWidth
-  state.players = []
-
-join = (userName) ->
+window.join = (userName) ->
   socket.emit 'join', {userName: userName}, (id) ->
     console.log 'Joined'
     state.playerId = id
 
-controls =
+window.controls =
   left: ->
     socket.emit 'left'
 
@@ -61,8 +64,8 @@ controls =
     socket.emit 'stopTurning'
 
 
-initGame = (players) ->
-  console.log 'Init game'
+window.initGame = (players) ->
+  console.log 'Init game with players', players
   for id, player of players
     el = document.createElementNS svg , "path"
     el.id = id
@@ -88,8 +91,8 @@ requestAnimationFrame ->
 
 onReady = ->
   console.log 'Document ready'
-  field = document.getElementById 'field'
-  svg = document.getElementById 'svg'
+  window.field = document.getElementById 'field'
+  window.svg = document.getElementById 'svg'
 
 document.addEventListener 'DOMContentLoaded', () ->
   onReady()
