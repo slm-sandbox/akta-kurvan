@@ -10,7 +10,7 @@ state =
   playerId: null
 
 # "Cached" DOM references
-field, svg = null
+field = svg = null
 
 class Player
   constructor: (element) ->
@@ -19,6 +19,8 @@ class Player
 
 
 socket = io.connect 'http://localhost:8080'
+socket.on 'connect', ->
+  console.log "Connected"
 
 socket.on 'players', (players) ->
   if not state.players[Object.keys(players)[0]]
@@ -56,10 +58,6 @@ initGame = (players) ->
     state.players[id] = new Player el
 
 
-reset = ->
-
-
-
 requestAnimationFrame ->
   for id, player of state.players
     el = player.pathElements[player.pathElements.length - 1]
@@ -74,6 +72,6 @@ onReady = ->
   field = document.getElementById 'field'
   svg = document.getElementById 'svg'
 
-document.addEvenetListener 'DOMContentLoaded', () ->
+document.addEventListener 'DOMContentLoaded', () ->
   onReady()
   document.removeEventListener 'DOMContentLoaded', arguments.callee
