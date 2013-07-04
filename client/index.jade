@@ -1,10 +1,10 @@
 !!! 5
-html(ng-app="AdvisorApp")
+html
   head
     title Akta Kurvan
     != css('style')
-
     script(src="/socket.io/socket.io.js")
+    != js('input')
     != js('index')
 
   body
