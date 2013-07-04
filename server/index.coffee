@@ -20,7 +20,6 @@ app.configure ->
 
 # Connect socket to server and game to socket
 io = require('socket.io').listen server
-io.set "log level", 3
 game = require('./game')(io)
 
 # Routes
