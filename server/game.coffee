@@ -18,8 +18,9 @@ createGame = ->
   players: gamePlayers
   state: 'starting'
   startTime: getTime()
-  maxX: 500
-  maxY: 500
+  dimensions:
+    x: 500
+    y: 500
 
 createPlayer = (username) ->
   id: uuid.v1()
@@ -39,14 +40,14 @@ createGamePlayer = (player) ->
 getTime = -> new Date().getTime()
 
 killPlayer = (id) ->
-  if game.players[id].alive
+  if game?.players[id].alive
     for player of game.players
       if player.alive
         player.score++
     game.players[id].alive = false
 
 collided = (x, y) ->
-  if x >= maxX or y >= maxY or x <= 0 or y <= 0
+  if x >= game.dimensions.x or y >= game.dimensions.y or x <= 0 or y <= 0
     return true
   else
     game.board[y] = game.board[y] || []
@@ -130,8 +131,7 @@ startGame = ->
   game = createGame()
 
   io.sockets.emit 'newGame',
-    maxX: game.maxX
-    maxY: game.maxY
+    dimensions: game.dimensions
     players: game.players
 
   do countdown = (i = 5) ->
@@ -165,9 +165,8 @@ module.exports = exports = (_io) ->
 
       cb null, player.id
 
-    socket.on 'disconnect', ->
-      delete players[player.id]
-      if game?.players[player.id]
+      socket.on 'disconnect', ->
         killPlayer player.id
+        delete players[player.id]
 
   startGame()
