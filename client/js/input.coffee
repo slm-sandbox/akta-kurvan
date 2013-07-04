@@ -35,5 +35,3 @@ attachDebugInputHandler = ->
       right: -> console.log "RIGHT"
       stop: -> console.log "STOP"
     keyDownHandler(controller, document)
-
-attachDebugInputHandler()
