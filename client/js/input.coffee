@@ -1,6 +1,6 @@
 # Attaches to a controller (which provides callbacks for left/right/stop) and
 # an element which input listeners are attached to.
-keyDownHandler = (controller, element) ->
+window.keyDownHandler = (controller, element) ->
   # KeyCode to action mapping
   keyMap =
     37: 'left'
@@ -28,7 +28,7 @@ keyDownHandler = (controller, element) ->
   element.addEventListener 'keyup', controlKeyListener
 
 # Call to debug controller input to console
-attachDebugInputHandler = ->
+window.attachDebugInputHandler = ->
   document.addEventListener 'DOMContentLoaded', ->
     controller =
       left: -> console.log "LEFT"

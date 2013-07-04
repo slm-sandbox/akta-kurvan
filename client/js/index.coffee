@@ -48,22 +48,6 @@ socket.on 'players', (players) ->
     players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
 
 
-window.join = (userName) ->
-  socket.emit 'join', {userName: userName}, (id) ->
-    console.log 'Joined'
-    state.playerId = id
-
-window.controls =
-  left: ->
-    socket.emit 'left'
-
-  right: ->
-    socket.emit 'right'
-
-  stop: ->
-    socket.emit 'stopTurning'
-
-
 window.initGame = (players) ->
   console.log 'Init game with players', players
   for id, player of players
@@ -80,6 +64,26 @@ window.initGame = (players) ->
     state.players[id] = new Player el
 
 
+window.join = (userName) ->
+  socket.emit 'join', {userName: userName}, (id) ->
+    console.log 'Joined'
+    state.playerId = id
+
+window.controls =
+  left: ->
+    console.log 'Emitting left'
+    socket.emit 'left'
+
+  right: ->
+    console.log 'Emitting right'
+    socket.emit 'right'
+
+  stop: ->
+    console.log 'Emitting stop'
+    socket.emit 'stopTurning'
+
+
+
 requestAnimationFrame ->
   console.log 'Rendering'
   for id, player of state.players
@@ -93,6 +97,9 @@ onReady = ->
   console.log 'Document ready'
   window.field = document.getElementById 'field'
   window.svg = document.getElementById 'svg'
+
+  keyDownHandler controls, document
+
 
 document.addEventListener 'DOMContentLoaded', () ->
   onReady()
