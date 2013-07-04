@@ -1,9 +1,30 @@
-io = require 'socket.io'
+app = require('express')()
+server = require('http').createServer app
+config = require './../config'
 
-io.listen 8989
+# Asset pipeline attched to express
+assets = require 'connect-assets'
+locals = {}
+assetPipeline = assets
+  src: __dirname + '/../client'
+  helperContext: locals
+locals.js.root = 'js'
+locals.css.root = 'css'
+locals.img.root = 'img'
 
-io.sockets.on 'connection', (s) ->
-  s.emit 'whatsup', { name: 'dawg' }
+# Express configuration
+app.configure ->
+  app.set 'views', __dirname + '/../client'
+  app.set 'view engine', 'jade'
+  app.use assetPipeline
 
-  s.on 'ciao', (data) ->
-    console.log data
+# Connect socket to server and game to socket
+io = require('socket.io').listen server
+game = require('./game')(io)
+
+# Routes
+app.get '/', (req, res) ->
+  res.render '../client/index', locals
+
+# Start it up
+module.exports = exports = server.listen config.port
