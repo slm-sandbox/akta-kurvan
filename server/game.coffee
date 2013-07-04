@@ -6,7 +6,7 @@ game = null
 
 radiansPerSecond = 1
 pixelsPerSecond = 20
-gameLoopInvterval = 100
+gameLoopInterval = 100
 immortalTime = 3000
 
 createGame = ->
@@ -147,7 +147,7 @@ startGame = ->
     dimensions: game.dimensions
     players: game.players
 
-  do countdown = (i = 1) ->
+  do countdown = (i = 5) ->
     io.sockets.emit 'countdown', i
 
     if i > 0
