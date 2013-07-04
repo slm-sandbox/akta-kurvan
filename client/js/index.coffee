@@ -18,18 +18,28 @@ class Player
     @pathElements = [element]
 
 
+handlers =
+  players: (players) ->
+    console.log 'Got players'
+    if not state.players[Object.keys(players)[0]]
+      initGame(players)
+
+    for id, player of players
+      players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
+
 socket = io.connect 'http://localhost:8080'
 socket.on 'connect', ->
   console.log "Connected"
 
 socket.on 'players', (players) ->
-  if not state.players[Object.keys(players)[0]]
-    initGame(players)
-
+  console.log 'Got players'
   for id, player of players
     players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
 
-socket.on 'reset', (data) ->
+socket.on 'newGame', (players) ->
+  console.log 'Got new game'
+  initGame(players)
+
   svg.innerHTML = ''
   svg.height = data.maxHeight
   svg.width  = data.maxWidth
@@ -37,28 +47,38 @@ socket.on 'reset', (data) ->
 
 join = (userName) ->
   socket.emit 'join', {userName: userName}, (id) ->
+    console.log 'Joined'
     state.playerId = id
 
-turnLeft = ->
-  socket.emit 'left'
+controls =
+  left: ->
+    socket.emit 'left'
 
-turnRight = ->
-  socket.emit 'right'
+  right: ->
+    socket.emit 'right'
 
-stopTurning = ->
-  socket.emit 'stopTurning'
+  stop: ->
+    socket.emit 'stopTurning'
 
 
 initGame = (players) ->
+  console.log 'Init game'
   for id, player of players
-    el = document.createElement('path')
+    el = document.createElementNS svg , "path"
     el.id = id
     el.d = "M #{player.x} #{player.y}"
+
+    if id is state.playerId
+      el.className = 'own'
+    else
+      el.className = 'enemy'
+
     svg.appendChild el
     state.players[id] = new Player el
 
 
 requestAnimationFrame ->
+  console.log 'Rendering'
   for id, player of state.players
     el = player.pathElements[player.pathElements.length - 1]
     toDraw = player.toDraw
@@ -66,9 +86,8 @@ requestAnimationFrame ->
     for point in toDraw
       el.d += " L #{point.x} #{point.y}"
 
-
-
 onReady = ->
+  console.log 'Document ready'
   field = document.getElementById 'field'
   svg = document.getElementById 'svg'
 
