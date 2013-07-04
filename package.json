@@ -1,0 +1,20 @@
+{
+  "name": "aktakurvan",
+  "version": "0.0.0",
+  "author": "DnD <dnd@advisa.se>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/slm-sandbox/akta-kurvan.git"
+  },
+  "dependencies": {
+    "coffee-script": "~1.6.2",
+    "socket.io": "~0.9.13",
+    "node-uuid": "~1.3.3",
+    "connect-assets": "~2.4.3",
+    "jade": "~0.30.0",
+    "stylus": "~0.32.1",
+    "nib": "~0.9.1",
+    "express": "~3.2.4",
+    "q": "~0.9"
+  }
+}
