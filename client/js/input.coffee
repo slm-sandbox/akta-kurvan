@@ -8,24 +8,24 @@ keyDownHandler = (controller, element) ->
 
   currentAction = defaultAction = 'stop'
 
-  # Send LEFT/RIGHT control event on keydown
-  element.addEventListener 'keydown', (event) ->
+  controlKeyListener = (event) ->
     key = event.keyCode
     action = keyMap[key]
     return unless action
-    controller[action]() unless currentAction is action
-    currentAction = action
-    event.stopPropagation()
 
-  # Send STOP control event on keyup
-  element.addEventListener 'keyup', (event) ->
-    key = event.keyCode
-    action = keyMap[key]
-    return unless action
-    if currentAction is action
+    # Keydown: LEFT / RIGHT
+    if event.type is 'keydown'
+      controller[action]() if currentAction isnt action
+      currentAction = action
+    # Keyup: STOP
+    else if currentAction is action
       controller[defaultAction]()
       currentAction = defaultAction
+
     event.stopPropagation()
+
+  element.addEventListener 'keydown', controlKeyListener
+  element.addEventListener 'keyup', controlKeyListener
 
 # Call to debug controller input to console
 attachDebugInputHandler = ->
@@ -35,3 +35,5 @@ attachDebugInputHandler = ->
       right: -> console.log "RIGHT"
       stop: -> console.log "STOP"
     keyDownHandler(controller, document)
+
+attachDebugInputHandler()
