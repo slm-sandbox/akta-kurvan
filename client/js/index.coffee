@@ -25,7 +25,7 @@ window.handlers =
       initGame(players)
 
     for id, player of players
-      players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
+      state.players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
 
 socket = io.connect 'http://localhost:8080'
 socket.on 'connect', ->
@@ -45,7 +45,7 @@ socket.on 'newGame', (data) ->
 socket.on 'players', (players) ->
   console.log 'Got players', players
   for id, player of players
-    players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
+    state.players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
 
 
 window.initGame = (players) ->
