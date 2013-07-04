@@ -75,7 +75,7 @@ movePlayer = (player, numPixels) ->
 
   dx = newX - player.x
   dy = newY - player.y
-
+  points = []
   if dx is 0
     for y in [player.y ... newY]
       points.push
@@ -85,8 +85,6 @@ movePlayer = (player, numPixels) ->
 
     error = 0
     deltaerr = Math.abs (dy / dx)
-
-    points = []
 
     y = player.y
     for x in [player.x ... newX]
