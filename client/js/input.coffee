@@ -3,26 +3,31 @@ keyDownHandler = (controller, element) ->
     37: 'left'
     39: 'right'
 
-  currentKey = null
+  currentAction = defaultAction = 'stop'
 
   element.addEventListener 'keydown', (event) ->
     key = event.keyCode
-    return unless keyMap[key]
-    controller[key]() unless currentKey is keyMap[key]
-    currentKey = keyMap[key]
-    event.stopPropagataion()
+    action = keyMap[key]
+    return unless action
+    controller[action]() unless currentAction is action
+    currentAction = action
+    event.stopPropagation()
 
   element.addEventListener 'keyup', (event) ->
     key = event.keyCode
-    return unless keyMap[key]
-    if currentKey is keyMap[key]
-      controller['stop']
-      currentKey = null
-    event.stopPropagataion()
+    action = keyMap[key]
+    return unless action
+    console.log { action: action, current: currentAction }
+    if currentAction is action
+      controller[defaultAction]()
+      currentAction = defaultAction
+    event.stopPropagation()
 
-document.attachEventListener 'DOMContentLoaded', ->
-  controller =
-    left: console.log "LEFT"
-    right: console.log "RIGHT"
-    stop: console.log "STOp"
-  keyDownHandler(controller, document)
+# Call to debug controller input to console
+debugController = ->
+  document.addEventListener 'DOMContentLoaded', ->
+    controller =
+      left: -> console.log "LEFT"
+      right: -> console.log "RIGHT"
+      stop: -> console.log "STOP"
+    keyDownHandler(controller, document)
