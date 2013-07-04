@@ -11,7 +11,7 @@ immortalTime = 3000
 
 createGame = ->
   gamePlayers = {}
-  for player of players
+  for _, player of players
     gamePlayers[player.id] = createGamePlayer player
 
   board: [[]]
@@ -32,7 +32,7 @@ createGamePlayer = (player) ->
   y: 50
   angle: 0
   alive: true
-  playerId: player.id
+  id: player.id
   trailActive: false
   username: player.username
   turning: 0
@@ -40,8 +40,8 @@ createGamePlayer = (player) ->
 getTime = -> new Date().getTime()
 
 killPlayer = (id) ->
-  if game?.players[id].alive
-    for player of game.players
+  if game?.players[id]?.alive
+    for _, player of game.players
       if player.alive
         player.score++
     game.players[id].alive = false
@@ -65,6 +65,9 @@ gameOver = ->
   startGame()
 
 movePlayer = (player, numPixels) ->
+  return if numPixels is 0
+  console.log numPixels
+
   player.angle += player.turning * radiansPerSecond
 
   newX = Math.round(player.x + Math.sin(player.angle) * numPixels)
@@ -72,25 +75,35 @@ movePlayer = (player, numPixels) ->
 
   dx = newX - player.x
   dy = newY - player.y
-  error = 0
-  deltaerr = Math.abs (dy / dx)
 
-  points = []
-  y = player.y
-  for x in [player.x ... newX]
-    points.push
-      x: x
-      y: y
-    error += deltaerr
-    if error >= 0.5
-      y += 1
-      error -= 1.0
+  if dx is 0
+    for y in [player.y ... newY]
+      points.push
+        x: player.x
+        y: y
+  else
+
+    error = 0
+    deltaerr = Math.abs (dy / dx)
+
+    points = []
+
+    y = player.y
+    for x in [player.x ... newX]
+      points.push
+        x: x
+        y: y
+      error += deltaerr
+      if error >= 0.5
+        y += 1
+        error -= 1.0
 
   visited = []
+
   for point in points
     visited.push point
 
-    if collided(x, y)
+    if getTime() - game.startTime > immortalTime and collided(point.x, point.y)
       killPlayer player.id
       break
 
@@ -101,22 +114,22 @@ movePlayer = (player, numPixels) ->
     setVisisted(point.x, point.y - 1)
     setVisisted(point.x, point.y + 1)
 
-  player.x = visited[points.length - 1].x
-  player.y = visited[points.length - 1].y
+
+  player.x = visited[visited.length - 1].x
+  player.y = visited[visited.length - 1].y
 
 gameLoop = (previousStepStartTime) ->
   thisStepStartTime = getTime()
   dt = thisStepStartTime - previousStepStartTime
   numPixels = pixelsPerSecond * dt
 
-  for player of game.players
+  for _, player of game.players
     movePlayer player, numPixels
 
-  console.log players
   io.sockets.emit 'players', game.players
 
   alive = 0
-  for player of game.players
+  for _, player of game.players
     if player.alive
       alive++
 
@@ -134,7 +147,7 @@ startGame = ->
     dimensions: game.dimensions
     players: game.players
 
-  do countdown = (i = 5) ->
+  do countdown = (i = 1) ->
     io.sockets.emit 'countdown', i
 
     if i > 0
@@ -142,7 +155,7 @@ startGame = ->
         countdown i - 1
       , 1000
     else
-      gameLoop()
+      gameLoop(getTime())
 
 module.exports = exports = (_io) ->
   io = _io

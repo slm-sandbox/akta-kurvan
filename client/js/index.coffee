@@ -50,6 +50,8 @@ join = (userName) ->
     console.log 'Joined'
     state.playerId = id
 
+join("test")
+
 controls =
   left: ->
     socket.emit 'left'
