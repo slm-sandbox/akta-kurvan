@@ -106,11 +106,11 @@ movePlayer = (player, numPixels) ->
       break
 
   for point in visited
-    setVisisted(point.x, point.y)
-    setVisisted(point.x - 1, point.y)
-    setVisisted(point.x + 1, point.y)
-    setVisisted(point.x, point.y - 1)
-    setVisisted(point.x, point.y + 1)
+    setVisited(point.x, point.y)
+    setVisited(point.x - 1, point.y)
+    setVisited(point.x + 1, point.y)
+    setVisited(point.x, point.y - 1)
+    setVisited(point.x, point.y + 1)
 
 
   player.x = visited[visited.length - 1].x
