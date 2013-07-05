@@ -5,8 +5,8 @@ players = {}
 game = null
 
 radiansPerSecond = 1
-pixelsPerSecond = 20
-gameLoopInterval = 100
+pixelsPerSecond = 80
+gameLoopInterval = 300
 immortalTime = 3000
 
 createGame = ->
@@ -28,9 +28,10 @@ createPlayer = (username) ->
   username: username
 
 createGamePlayer = (player) ->
-  x: 50
-  y: 50
-  angle: 0
+  x: Math.floor(Math.random() * game.dimensions.x)
+  y: Math.floor(Math.random() * game.dimensions.y)
+  angle: Math.random() * (2*Math.PI)
+
   alive: true
   id: player.id
   trailActive: false
@@ -66,7 +67,6 @@ gameOver = ->
 
 movePlayer = (player, numPixels) ->
   return if numPixels is 0
-  console.log numPixels
 
   player.angle += player.turning * radiansPerSecond
 
@@ -112,14 +112,17 @@ movePlayer = (player, numPixels) ->
     setVisited(point.x, point.y - 1)
     setVisited(point.x, point.y + 1)
 
+  #console.log "#{player.id} x: #{player.x} -> #{newX} y: #{player.y} -> #{newY}"
 
   player.x = visited[visited.length - 1].x
   player.y = visited[visited.length - 1].y
 
+
 gameLoop = (previousStepStartTime) ->
   thisStepStartTime = getTime()
   dt = thisStepStartTime - previousStepStartTime
-  numPixels = pixelsPerSecond * dt
+  console.log dt
+  numPixels = Math.round(pixelsPerSecond * (dt/1000))
 
   for _, player of game.players
     movePlayer player, numPixels
