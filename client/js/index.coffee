@@ -40,16 +40,17 @@ socket.on 'newGame', (data) ->
 
   svg.width = data.dimensions.x
   svg.height = data.dimensions.y
-  state.players = []
 
 socket.on 'players', (players) ->
   console.log 'Got players', players
   for id, player of players
     state.players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
+  return
 
 
 window.initGame = (players) ->
   console.log 'Init game with players', players
+  state.players = []
   for id, player of players
     el = document.createElementNS svg , "path"
     el.id = id
@@ -62,6 +63,7 @@ window.initGame = (players) ->
 
     svg.appendChild el
     state.players[id] = new Player el
+  return
 
 
 window.join = (userName) ->
