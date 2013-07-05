@@ -18,28 +18,20 @@ class Player
     @pathElements = [element]
 
 
-window.handlers =
-  players: (players) ->
-    console.log 'Got players'
-    if not state.players[Object.keys(players)[0]]
-      initGame(players)
-
-    for id, player of players
-      state.players[id].toDraw.push {x: player.x, y: player.y, trailActive: player.trailActive}
-
 socket = io.connect 'http://localhost:8080'
 socket.on 'connect', ->
   console.log "Connected"
 
 socket.on 'newGame', (data) ->
   console.log 'Got new game'
-  initGame(data.players)
-
   while svg.lastChild
       svg.removeChild(svg.lastChild);
 
   svg.width = data.dimensions.x
   svg.height = data.dimensions.y
+
+  initPlayers(data.players)
+
 
 socket.on 'players', (players) ->
   console.log 'Got players', players
@@ -48,21 +40,21 @@ socket.on 'players', (players) ->
   return
 
 
-window.initGame = (players) ->
+window.initPlayers = (players) ->
   console.log 'Init game with players', players
   state.players = []
   for id, player of players
-    el = document.createElementNS svg , "path"
-    el.id = id
-    el.d = "M #{player.x} #{player.y}"
+    path = d3svg.append('svg:path')
+      .attr("id", id)
+      .attr("d", "M #{player.x} #{player.y}")
 
     if id is state.playerId
-      el.className = 'own'
+      className = 'own'
     else
-      el.className = 'enemy'
+      className = 'enemy'
+    path.attr('class', className)
 
-    svg.appendChild el
-    state.players[id] = new Player el
+    state.players[id] = new Player path
   return
 
 
@@ -85,20 +77,29 @@ window.controls =
     socket.emit 'stopTurning'
 
 
-
-requestAnimationFrame ->
+render = ->
   console.log 'Rendering'
   for id, player of state.players
-    el = player.pathElements[player.pathElements.length - 1]
+    path = player.pathElements[player.pathElements.length - 1]
     toDraw = player.toDraw
     player.toDraw = []
+    pointsStr = ""
     for point in toDraw
-      el.d += " L #{point.x} #{point.y}"
+      pointsStr += " L #{point.x} #{point.y}"
+    path.attr('d', path.attr('d') + pointsStr)
+
+  requestAnimationFrame ->
+    render()
+
+requestAnimationFrame ->
+  render()
 
 onReady = ->
   console.log 'Document ready'
   window.field = document.getElementById 'field'
   window.svg = document.getElementById 'svg'
+  window.d3svg = d3.select(svg)
+
 
   keyDownHandler controls, document
 
