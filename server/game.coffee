@@ -121,7 +121,6 @@ movePlayer = (player, numPixels) ->
 gameLoop = (previousStepStartTime) ->
   thisStepStartTime = getTime()
   dt = thisStepStartTime - previousStepStartTime
-  console.log dt
   numPixels = Math.round(pixelsPerSecond * (dt/1000))
 
   for _, player of game.players
